@@ -1,0 +1,565 @@
+/* ============================================
+   Career Presentation — Styles
+   Kid-friendly, projector-optimized dark theme
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0a0a2e;
+  --bg-light: #12123a;
+  --cyan: #00d4ff;
+  --pink: #ff3e8a;
+  --yellow: #ffd93d;
+  --green: #4ade80;
+  --purple: #a78bfa;
+  --orange: #fb923c;
+  --white: #f0f0ff;
+  --gray: #8888aa;
+  --font: 'Nunito', system-ui, sans-serif;
+  --slide-transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Slide Container --- */
+.deck {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 6vw;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(60px);
+  transition: opacity var(--slide-transition), transform var(--slide-transition);
+  text-align: center;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+/* --- Typography --- */
+h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 0.4em;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(2rem, 4.5vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 0.5em;
+}
+
+p, .subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  line-height: 1.5;
+  max-width: 48ch;
+  color: var(--gray);
+}
+
+.subtitle {
+  margin-top: 0.3em;
+}
+
+/* Color utility classes */
+.cyan    { color: var(--cyan); }
+.pink    { color: var(--pink); }
+.yellow  { color: var(--yellow); }
+.green   { color: var(--green); }
+.purple  { color: var(--purple); }
+.orange  { color: var(--orange); }
+
+/* --- Accent Shapes (decorative) --- */
+.slide::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Each slide gets a different glow */
+.slide:nth-child(odd)::before {
+  width: 50vw; height: 50vw;
+  background: var(--cyan);
+  top: -15vw; right: -15vw;
+}
+.slide:nth-child(even)::before {
+  width: 45vw; height: 45vw;
+  background: var(--pink);
+  bottom: -10vw; left: -10vw;
+}
+
+/* --- Grid Layouts --- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5vw;
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2vw;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 1.5rem;
+}
+
+.grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5vw;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 1.5rem;
+}
+
+.grid-6 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1.8vw;
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 1.5rem;
+}
+
+/* --- Cards (used inside grids) --- */
+.card {
+  background: var(--bg-light);
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: 1.2rem;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.card.highlighted {
+  border-color: var(--cyan);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+}
+
+.card .icon {
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  line-height: 1;
+}
+
+.card .label {
+  font-size: clamp(0.95rem, 1.5vw, 1.3rem);
+  font-weight: 700;
+  color: var(--white);
+}
+
+.card .desc {
+  font-size: clamp(0.8rem, 1.1vw, 1rem);
+  color: var(--gray);
+}
+
+/* --- Image Placeholder --- */
+.img-placeholder {
+  background: var(--bg-light);
+  border: 2px dashed rgba(255,255,255,0.1);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  overflow: hidden;
+  position: relative;
+}
+
+.img-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* --- Equation visual --- */
+.equation {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.equation .part {
+  background: var(--bg-light);
+  border-radius: 1rem;
+  padding: 1.2rem 2rem;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 900;
+}
+
+.equation .operator {
+  font-size: 2.5rem;
+  font-weight: 900;
+}
+
+/* --- Big Emoji / Icon --- */
+.big-icon {
+  font-size: clamp(4rem, 10vw, 8rem);
+  line-height: 1;
+  margin-bottom: 0.3em;
+}
+
+/* --- Demo Banner --- */
+.demo-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  padding: 0.8rem 2.5rem;
+  border-radius: 100px;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  animation: pulse 2s ease-in-out infinite;
+  margin-top: 1.5rem;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* --- Prompt Bubbles (for audience interaction cues) --- */
+.prompt {
+  background: rgba(255,255,255,0.07);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 0.8rem 0.8rem 0;
+  padding: 1rem 1.8rem;
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  color: var(--yellow);
+  max-width: 700px;
+  text-align: left;
+}
+
+/* --- Question starters (wrap-up slide) --- */
+.question-starters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  max-width: 600px;
+}
+
+.question-starters .q {
+  background: var(--bg-light);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-weight: 700;
+  text-align: left;
+  border: 2px solid rgba(255,255,255,0.06);
+}
+
+/* --- Progress Bar --- */
+.progress {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+/* --- Slide Counter --- */
+.slide-counter {
+  position: fixed;
+  bottom: 1.2rem;
+  right: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gray);
+  opacity: 0.5;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* --- Navigation Hint --- */
+.nav-hint {
+  position: fixed;
+  bottom: 1.2rem;
+  left: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--gray);
+  opacity: 0.3;
+  z-index: 100;
+  transition: opacity 0.3s;
+}
+
+.nav-hint:hover {
+  opacity: 0.7;
+}
+
+/* --- Fragment animation (staggered reveals inside a slide) --- */
+.fragment {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.fragment.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children */
+.stagger > .fragment:nth-child(1) { transition-delay: 0.05s; }
+.stagger > .fragment:nth-child(2) { transition-delay: 0.12s; }
+.stagger > .fragment:nth-child(3) { transition-delay: 0.19s; }
+.stagger > .fragment:nth-child(4) { transition-delay: 0.26s; }
+.stagger > .fragment:nth-child(5) { transition-delay: 0.33s; }
+.stagger > .fragment:nth-child(6) { transition-delay: 0.40s; }
+
+/* --- Fullscreen background image slide --- */
+.slide.bg-cover {
+  background-size: cover;
+  background-position: center;
+}
+
+.slide.bg-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,10,46,0.92), rgba(10,10,46,0.4));
+  z-index: 0;
+}
+
+.slide.bg-cover > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Annotation arrows (for the classroom slide) --- */
+.annotated-scene {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  aspect-ratio: 16/9;
+  background: var(--bg-light);
+  border-radius: 1.2rem;
+  border: 2px solid rgba(255,255,255,0.06);
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.annotated-scene .tag {
+  position: absolute;
+  background: var(--cyan);
+  color: var(--bg);
+  font-size: clamp(0.65rem, 1vw, 0.85rem);
+  font-weight: 900;
+  padding: 0.3rem 0.7rem;
+  border-radius: 100px;
+  white-space: nowrap;
+  animation: float 3s ease-in-out infinite;
+}
+
+.annotated-scene .tag:nth-child(even) {
+  animation-delay: -1.5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* --- Specific tag positions (classroom scene) --- */
+.tag.pos-clock     { top: 10%; left: 12%; }
+.tag.pos-desk      { bottom: 20%; left: 25%; background: var(--pink); }
+.tag.pos-board     { top: 20%; right: 15%; background: var(--yellow); color: var(--bg); }
+.tag.pos-door      { bottom: 30%; right: 10%; background: var(--green); color: var(--bg); }
+.tag.pos-light     { top: 8%; left: 50%; background: var(--purple); }
+.tag.pos-chair     { bottom: 15%; right: 35%; background: var(--orange); color: var(--bg); }
+
+/* --- Tools panel --- */
+.tools-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2vw;
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 1.5rem;
+}
+
+.tool-card {
+  background: var(--bg-light);
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: 1.2rem;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.tool-card .tool-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.tool-card .tool-name {
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  font-weight: 900;
+}
+
+.tool-card .tool-desc {
+  font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+  color: var(--gray);
+}
+
+/* --- VR / AR comparison --- */
+.vr-ar-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3vw;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 1.5rem;
+}
+
+.vr-ar-compare .side {
+  background: var(--bg-light);
+  border-radius: 1.2rem;
+  padding: 2rem;
+  border: 2px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.vr-ar-compare .side .icon {
+  font-size: 4rem;
+}
+
+.vr-ar-compare .side h3 {
+  margin-bottom: 0;
+}
+
+.vr-ar-compare .side p {
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+  color: var(--gray);
+  text-align: center;
+}
+
+/* --- Empowerment grid (closing slide) --- */
+.empowerment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5vw;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 1.5rem;
+}
+
+.empowerment-grid .item {
+  background: var(--bg-light);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid rgba(255,255,255,0.06);
+}
+
+.empowerment-grid .item .icon {
+  font-size: 2.5rem;
+}
+
+.empowerment-grid .item .label {
+  font-size: clamp(0.8rem, 1.1vw, 1rem);
+  font-weight: 700;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .grid-3, .tools-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+  .grid-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-6 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .empowerment-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .vr-ar-compare {
+    grid-template-columns: 1fr;
+  }
+}
