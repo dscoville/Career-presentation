@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch Game!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a2e;
+      font-family: 'Nunito', system-ui, sans-serif;
+      color: #f0f0ff;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* --- Theme Picker --- */
+    #theme-picker {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      background: #0a0a2e;
+    }
+
+    #theme-picker h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.3em;
+    }
+
+    #theme-picker p {
+      color: #8888aa;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .theme-options {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .theme-btn {
+      background: #12123a;
+      border: 3px solid rgba(255,255,255,0.08);
+      border-radius: 1.2rem;
+      padding: 1.5rem 2.5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s, border-color 0.2s;
+      color: #f0f0ff;
+      font-family: inherit;
+    }
+
+    .theme-btn:hover {
+      transform: translateY(-5px);
+      border-color: #00d4ff;
+    }
+
+    .theme-btn .emoji { font-size: 3.5rem; }
+    .theme-btn .name { font-size: 1.2rem; font-weight: 900; }
+
+    /* --- HUD --- */
+    #hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.5rem;
+      font-weight: 900;
+      font-size: 1.3rem;
+      z-index: 10;
+      position: relative;
+    }
+
+    #hud .score-label { color: #00d4ff; }
+    #hud .timer-label { color: #ff3e8a; }
+    #hud .lives-label { color: #ffd93d; }
+
+    /* --- Canvas --- */
+    #game-canvas {
+      flex: 1;
+      display: block;
+      width: 100%;
+    }
+
+    /* --- Game Over --- */
+    #game-over {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,10,46,0.92);
+      z-index: 15;
+    }
+
+    #game-over.show { display: flex; }
+
+    #game-over h1 { font-size: 3rem; margin-bottom: 0.3em; }
+    #game-over .final-score { font-size: 1.8rem; color: #00d4ff; margin-bottom: 1.5rem; }
+
+    #play-again {
+      background: linear-gradient(135deg, #ff3e8a, #a78bfa);
+      border: none;
+      color: white;
+      font-family: inherit;
+      font-size: 1.3rem;
+      font-weight: 900;
+      padding: 0.8rem 2.5rem;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    #play-again:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+<!-- Theme Picker -->
+<div id="theme-picker">
+  <h1>🎮 Pick a Theme!</h1>
+  <p>What should we catch?</p>
+  <div class="theme-options">
+    <button class="theme-btn" data-theme="dino">
+      <span class="emoji">🦖</span>
+      <span class="name">Dinosaurs</span>
+    </button>
+    <button class="theme-btn" data-theme="space">
+      <span class="emoji">👽</span>
+      <span class="name">Space</span>
+    </button>
+    <button class="theme-btn" data-theme="pizza">
+      <span class="emoji">🍕</span>
+      <span class="name">Pizza</span>
+    </button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" style="display:none;">
+  <span class="score-label">Score: <span id="score">0</span></span>
+  <span class="timer-label">Time: <span id="timer">30</span>s</span>
+  <span class="lives-label">Lives: <span id="lives"></span></span>
+</div>
+
+<!-- Game Canvas -->
+<canvas id="game-canvas" style="display:none;"></canvas>
+
+<!-- Game Over -->
+<div id="game-over">
+  <h1>🎉 Game Over!</h1>
+  <div class="final-score">Score: <span id="final-score">0</span></div>
+  <button id="play-again">Play Again</button>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* --- Theme Data --- */
+  var themes = {
+    dino: {
+      items: ['🦕', '🦖', '🥚', '🌿', '🦴'],
+      bad:   ['☄️', '🌋'],
+      player: '🧑',
+      bg:     '#0a1a0a'
+    },
+    space: {
+      items: ['⭐', '🪐', '🌙', '🚀', '👾'],
+      bad:   ['☄️', '🛸'],
+      player: '🧑‍🚀',
+      bg:     '#05051a'
+    },
+    pizza: {
+      items: ['🍕', '🧀', '🍅', '🫓', '🌶️'],
+      bad:   ['🥦', '🧅'],
+      player: '🍽️',
+      bg:     '#1a0a05'
+    }
+  };
+
+  var currentTheme = null;
+
+  /* --- DOM --- */
+  var picker    = document.getElementById('theme-picker');
+  var hud       = document.getElementById('hud');
+  var canvas    = document.getElementById('game-canvas');
+  var ctx       = canvas.getContext('2d');
+  var scoreEl   = document.getElementById('score');
+  var timerEl   = document.getElementById('timer');
+  var livesEl   = document.getElementById('lives');
+  var overPanel = document.getElementById('game-over');
+  var finalEl   = document.getElementById('final-score');
+  var againBtn  = document.getElementById('play-again');
+
+  /* --- Game State --- */
+  var score, lives, timeLeft, items, player, gameRunning, timerInterval;
+  var PLAYER_SIZE, ITEM_SIZE, SPEED_MIN, SPEED_MAX;
+
+  /* --- Theme Selection --- */
+  var themeBtns = document.querySelectorAll('.theme-btn');
+  themeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      currentTheme = themes[btn.dataset.theme];
+      document.body.style.background = currentTheme.bg;
+      picker.style.display = 'none';
+      startGame();
+    });
+  });
+
+  againBtn.addEventListener('click', function() {
+    overPanel.classList.remove('show');
+    startGame();
+  });
+
+  /* --- Resize --- */
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight - hud.offsetHeight;
+    PLAYER_SIZE = Math.max(40, canvas.width * 0.06);
+    ITEM_SIZE   = Math.max(28, canvas.width * 0.04);
+  }
+
+  window.addEventListener('resize', resize);
+
+  /* --- Start --- */
+  function startGame() {
+    hud.style.display = 'flex';
+    canvas.style.display = 'block';
+    resize();
+
+    score = 0;
+    lives = 3;
+    timeLeft = 30;
+    items = [];
+    gameRunning = true;
+    SPEED_MIN = 2;
+    SPEED_MAX = 5;
+
+    player = {
+      x: canvas.width / 2,
+      y: canvas.height - PLAYER_SIZE - 10,
+      emoji: currentTheme.player
+    };
+
+    scoreEl.textContent = score;
+    timerEl.textContent = timeLeft;
+    updateLivesDisplay();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      // Speed up over time
+      SPEED_MIN = 2 + (30 - timeLeft) * 0.08;
+      SPEED_MAX = 5 + (30 - timeLeft) * 0.12;
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    requestAnimationFrame(loop);
+  }
+
+  function updateLivesDisplay() {
+    livesEl.textContent = '❤️'.repeat(Math.max(0, lives));
+  }
+
+  function endGame() {
+    gameRunning = false;
+    clearInterval(timerInterval);
+    finalEl.textContent = score;
+    overPanel.classList.add('show');
+  }
+
+  /* --- Spawn --- */
+  var spawnTimer = 0;
+  function maybeSpawn(dt) {
+    spawnTimer += dt;
+    var interval = Math.max(300, 800 - (30 - timeLeft) * 15);
+    if (spawnTimer > interval) {
+      spawnTimer = 0;
+      var allItems = currentTheme.items;
+      var isBad = Math.random() < 0.2;
+      var pool = isBad ? currentTheme.bad : allItems;
+      var emoji = pool[Math.floor(Math.random() * pool.length)];
+      items.push({
+        x: ITEM_SIZE + Math.random() * (canvas.width - ITEM_SIZE * 2),
+        y: -ITEM_SIZE,
+        emoji: emoji,
+        speed: SPEED_MIN + Math.random() * (SPEED_MAX - SPEED_MIN),
+        bad: isBad
+      });
+    }
+  }
+
+  /* --- Input --- */
+  var mouseX = null;
+  canvas.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+  });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    mouseX = e.touches[0].clientX;
+  }, { passive: false });
+
+  canvas.addEventListener('touchstart', function(e) {
+    mouseX = e.touches[0].clientX;
+  }, { passive: true });
+
+  /* --- Game Loop --- */
+  var lastTime = 0;
+  function loop(ts) {
+    if (!gameRunning) return;
+
+    var dt = lastTime ? ts - lastTime : 16;
+    lastTime = ts;
+
+    // Move player toward mouse/touch
+    if (mouseX !== null) {
+      var target = Math.max(PLAYER_SIZE / 2, Math.min(canvas.width - PLAYER_SIZE / 2, mouseX));
+      player.x += (target - player.x) * 0.18;
+    }
+
+    // Spawn & update items
+    maybeSpawn(dt);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw items
+    for (var i = items.length - 1; i >= 0; i--) {
+      var it = items[i];
+      it.y += it.speed;
+
+      // Collision with player
+      var dx = it.x - player.x;
+      var dy = it.y - player.y;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < (PLAYER_SIZE + ITEM_SIZE) * 0.45) {
+        if (it.bad) {
+          lives--;
+          updateLivesDisplay();
+          if (lives <= 0) { endGame(); return; }
+        } else {
+          score += 10;
+          scoreEl.textContent = score;
+        }
+        items.splice(i, 1);
+        continue;
+      }
+
+      // Off screen
+      if (it.y > canvas.height + ITEM_SIZE) {
+        // Missing a good item costs nothing; missing bad is fine
+        items.splice(i, 1);
+        continue;
+      }
+
+      ctx.font = ITEM_SIZE + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(it.emoji, it.x, it.y);
+    }
+
+    // Draw player
+    ctx.font = PLAYER_SIZE + 'px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(player.emoji, player.x, player.y);
+
+    requestAnimationFrame(loop);
+  }
+
+})();
+</script>
+
+</body>
+</html>
