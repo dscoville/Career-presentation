@@ -266,6 +266,45 @@ p, .subtitle {
   margin-bottom: 0.3em;
 }
 
+/* --- Photo icons (replace emoji with images) --- */
+.icon-photo {
+  width: clamp(60px, 8vw, 100px);
+  height: clamp(60px, 8vw, 100px);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255,255,255,0.1);
+}
+
+.big-icon-photo {
+  width: clamp(120px, 18vw, 220px);
+  height: clamp(120px, 18vw, 220px);
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.3em;
+  border: 4px solid rgba(255,255,255,0.1);
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+}
+
+.card .icon-photo {
+  width: clamp(50px, 5vw, 80px);
+  height: clamp(50px, 5vw, 80px);
+}
+
+.tool-card .icon-photo {
+  width: clamp(50px, 5vw, 80px);
+  height: clamp(50px, 5vw, 80px);
+}
+
+.vr-ar-compare .side .icon-photo {
+  width: clamp(70px, 8vw, 110px);
+  height: clamp(70px, 8vw, 110px);
+}
+
+.empowerment-grid .item .icon-photo {
+  width: clamp(45px, 4vw, 65px);
+  height: clamp(45px, 4vw, 65px);
+}
+
 /* --- Demo Banner --- */
 .demo-banner {
   display: inline-flex;
