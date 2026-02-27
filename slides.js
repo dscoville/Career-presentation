@@ -18,10 +18,38 @@
 
   /* ---------- helpers ---------- */
 
+  const counterLabel = counter.querySelector('.slide-counter-label');
+  const picker = counter.querySelector('.slide-picker');
+
+  function getSlideTitle(slide, index) {
+    var h = slide.querySelector('h1, h2');
+    if (h) return h.textContent.trim().substring(0, 30);
+    return 'Slide ' + (index + 1);
+  }
+
+  // Build picker items
+  slides.forEach(function (slide, i) {
+    var item = document.createElement('div');
+    item.className = 'slide-picker-item';
+    item.textContent = (i + 1) + '. ' + getSlideTitle(slide, i);
+    item.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var dir = i > current ? 'forward' : 'backward';
+      goTo(i, dir);
+    });
+    picker.appendChild(item);
+  });
+
   function updateProgress() {
     const pct = ((current + 1) / total) * 100;
     progress.style.width = pct + '%';
-    counter.textContent = (current + 1) + ' / ' + total;
+    counterLabel.textContent = (current + 1) + ' / ' + total;
+
+    // Update active state in picker
+    var items = picker.querySelectorAll('.slide-picker-item');
+    items.forEach(function (item, i) {
+      item.classList.toggle('active', i === current);
+    });
   }
 
   function revealFragments(slide) {
