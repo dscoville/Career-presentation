@@ -39,9 +39,12 @@
   }
 
   function goTo(index, direction) {
-    if (index < 0 || index >= total || index === current || isAnimating) return;
+    if (index < 0 || index >= total || index === current) return;
 
-    isAnimating = true;
+    // If already animating, instantly finish the previous transition
+    slides.forEach(function (s) {
+      s.classList.remove('exit-left');
+    });
 
     var prev = slides[current];
     var next = slides[index];
@@ -49,8 +52,6 @@
     // Determine exit direction class
     if (direction === 'forward') {
       prev.classList.add('exit-left');
-    } else {
-      // Going backward: the previous slide exits to the right (default)
     }
 
     prev.classList.remove('active');
@@ -75,8 +76,7 @@
     }, 150);
 
     setTimeout(function () {
-      prev.classList.remove('exit-left');
-      isAnimating = false;
+      next.classList.remove('exit-left');
     }, ANIM_DURATION);
   }
 
@@ -105,6 +105,7 @@
         e.preventDefault();
         prev();
         break;
+      case 'r':
       case 'Home':
         e.preventDefault();
         goTo(0, 'backward');
